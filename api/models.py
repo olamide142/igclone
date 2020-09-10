@@ -23,7 +23,7 @@ class Comment(models.Model):
     username = models.CharField(max_length=15, unique=True, null=False)
     type_of_post = models.CharField(max_length=2, choices=type_of_post_choice, null=False)
     post_id = models.UUIDField(null=False)
-    content = models.CharField(max_length=300, default=True)
+    content = models.CharField(max_length=300)
     created_on =  models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
@@ -42,9 +42,12 @@ class Follows(models.Model):
 
 class Image(models.Model):
 
+    category_of_image = [('PI','Profile Image'), ('RI','Regular Image')]
+
     image_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField(max_length=15, unique=True, null=False)
-    url = models.CharField(max_length=300, null=False)
+    category = models.CharField(max_length=2, choices=category_of_image, null=False)
+    url = models.CharField(max_length=36, null=False)
     created_on =  models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 

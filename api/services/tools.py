@@ -10,7 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from api.models import Account as Account_DB
-import json
+import json, os, uuid
 
 class Tools:
 
@@ -75,3 +75,34 @@ class Tools:
 
         return JsonResponse({"status":status, "msg":msg})
 
+
+    @staticmethod
+    def handle_uploaded_file(f, ext):
+        """
+        upload a file in chunks to the
+        fake_server directory
+        :param f: File object
+        :param ext: str (image extention)
+        :return: bool
+        """
+        id = str(uuid.uuid4())
+        val = (False, None)
+        file_name = f"api/fake_server/igcloneimage{id}.{ext}"
+
+        with open('api/fake_server/igcloneimage{id}.{ext}', 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+            val = (True, file_name)
+        return val
+
+    @staticmethod
+    def delete_image(image_url):
+        """
+        Delete an image from the
+        :param image_url: str
+        :return: None
+        """
+        if os.remove(image_url):
+            return True
+        else:
+            return False

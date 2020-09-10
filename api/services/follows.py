@@ -96,6 +96,67 @@ class Follows:
                 f.save()
         return JsonResponse({ 'status' : True, 'msg' : 'Success'})
 
+    @staticmethod
+    @require_http_methods(["POST"])
+    def block_or_unblock(request):
+        """
+        Block or unblock  a user
+        @param:request HttpRequest
+        @return: JsonResponse
+        """
+        if request.user.is_authenticated:
+            user = request.user
+            username_to_block = \
+                Account_DB.objects.filter(username=json.loads(request.body)['username']).first()
+
+            f = Follows_DB.objects.filter(username1=user.username, username2=username_to_block).first() \
+                or Follows_DB.objects.filter(username1=username_to_block, username2=user.username).first()
+
+            if f is not None:
+                if f.username1 == user.username:
+                    x,y = f.is_blocked.split("-")
+                    x = abs(int(x) + -1) # Invert the Val from 0-1, vice versa
+                elif f.username2 == user.username:
+                    x, y = f.is_blocked.split("-")
+                    y = abs(int(y) + -1) # Invert the Val from 0-1, vice versa
+                f.is_blocked = f"{x}-{y}"
+                f.save()
+            else:
+                f = Follows_DB(username1=user.username, username2=username_to_block, is_blocked="1-0")
+                f.save()
+        return JsonResponse({ 'status' : True, 'msg' : 'Success'})
+
+    @staticmethod
+    @require_http_methods(["POST"])
+    def muted_or_unmute(request):
+        """
+        Mute or Unmute a user
+        @param:request HttpRequest
+        @return: JsonResponse
+        """
+        if request.user.is_authenticated:
+            user = request.user
+            username_to_mute = \
+                Account_DB.objects.filter(username=json.loads(request.body)['username']).first()
+
+            f = Follows_DB.objects.filter(username1=user.username, username2=username_to_mute).first() \
+                or Follows_DB.objects.filter(username1=username_to_mute, username2=user.username).first()
+
+            if f is not None:
+                if f.username1 == user.username:
+                    x,y = f.is_muted.split("-")
+                    x = abs(int(x) + -1) # Invert the Val from 0-1, vice versa
+                elif f.username2 == user.username:
+                    x, y = f.is_muted.split("-")
+                    y = abs(int(y) + -1) # Invert the Val from 0-1, vice versa
+                f.is_muted = f"{x}-{y}"
+                f.save()
+            else:
+                f = Follows_DB(username1=user.username, username2=username_to_mute, is_muted="1-0")
+                f.save()
+        return JsonResponse({ 'status' : True, 'msg' : 'Success'})
+
+
 
     @staticmethod
     def request_to_follow(user_logged_in, user_to_follow):
