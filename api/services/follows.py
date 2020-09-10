@@ -1,4 +1,9 @@
 from api.models import Follows as Follows_DB
+from api.models import Account as Account_DB
+from django.views.decorators.http import require_http_methods
+from django.http import  JsonResponse, HttpResponse
+
+import json
 
 
 class Follows:
@@ -58,7 +63,7 @@ class Follows:
 
 
     @staticmethod
-    @require_http_method(["POST"])
+    @require_http_methods(["POST"])
     def follow_or_unfollow(request):
         """
         Follow or unfollow  a user
@@ -67,5 +72,31 @@ class Follows:
         """
         if request.user.is_authenticated:
             user = request.user
-            F
-            
+            username_to_follow = \
+                Account_DB.objects.filter(username=json.loads(request.body)['username']).first()
+
+            if username_to_follow.is_private:
+                pass # Send a follow request to user first
+                return JsonResponse({'status': True, 'msg': 'Success'})
+
+            f = Follows_DB.objects.filter(username1=user.username, username2=username_to_follow).first() \
+                or Follows_DB.objects.filter(username1=username_to_follow, username2=user.username).first()
+
+            if f is not None:
+                if f.username1 == user.username:
+                    x,y = f.is_following.split("-")
+                    x = abs(int(x) + -1) # Invert the Val from 0-1, vice versa
+                elif f.username2 == user.username:
+                    x, y = f.is_following.split("-")
+                    y = abs(int(y) + -1) # Invert the Val from 0-1, vice versa
+                f.is_following = f"{x}-{y}"
+                f.save()
+            else:
+                f = Follows_DB(username1=user.username, username2=username_to_follow, is_following="1-0")
+                f.save()
+        return JsonResponse({ 'status' : True, 'msg' : 'Success'})
+
+
+    @staticmethod
+    def request_to_follow(user_logged_in, user_to_follow):
+        pass

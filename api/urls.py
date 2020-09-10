@@ -5,6 +5,7 @@ from .services.register import Register
 from .services.auth import Auth
 from .services.account import Account
 from .services.tools import Tools
+from .services.follows import Follows
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -19,6 +20,9 @@ urlpatterns = [
     # Account
     path('account/<str:username>/', Account.view_account, name='view_account'),
     path('account/<str:username>/update/', Account.update_account, name='update_account'),
+
+    # Follows
+    path('actions/follows/', Follows.follow_or_unfollow, name='follow_or_unfollow'),
 
     #Settings
     path('settings/', Tools.profile_settings, name='profile_settings'),
