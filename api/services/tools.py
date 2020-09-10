@@ -102,7 +102,12 @@ class Tools:
         :param image_url: str
         :return: None
         """
-        if os.remove(image_url):
-            return True
-        else:
-            return False
+        done = False
+
+        if os.path.exists(image_url):
+            try:
+                os.remove(image_url)
+                done = True
+            except Exception:
+                pass
+        return done
